@@ -1,4 +1,4 @@
-# dcom
+# A dynamic co-occurrence model (dcom)
 
 This is the data and code for:
 
