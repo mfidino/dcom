@@ -60,3 +60,5 @@ The ordering of the rows within `fidino_sp_data.csv` is hierarchical:
 Housing density was collected from the Silvis lab website and is from the 2010 census.
 
 Tree cover and Impervious cover were calculated from the 2011 NLCD data.
+
+<div align="center"><img width="100" height="auto" src="https://github.com/mfidino/cv/Raccoon.png" alt="A line drawing of a raccoon standing up and waving that Mason made." /></div>
