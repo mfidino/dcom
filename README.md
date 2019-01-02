@@ -61,4 +61,4 @@ Housing density was collected from the Silvis lab website and is from the 2010 c
 
 Tree cover and Impervious cover were calculated from the 2011 NLCD data.
 
-<div align="center"><img width="100" height="auto" src="https://github.com/mfidino/CV/blob/master/Raccoon.pngg" alt="A line drawing of a raccoon standing up and waving that Mason made." /></div>
+<div align="center"><img width="100" height="auto" src="https://github.com/mfidino/CV/blob/master/Raccoon.png" alt="A line drawing of a raccoon standing up and waving that Mason made." /></div>
