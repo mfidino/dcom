@@ -35,8 +35,6 @@ The ordering of the rows within `fidino_sp_data.csv` is hierarchical:
 1. By season (i.e., Spring, Summer, Fall, Winter).
 2. By camera trapping location (aphabetical, referred to as `StationID` in the file).
 
-## Structure of `fidino_sp_data.csv`
-
 | Column header  | Data type  | Description  |
 |---|---|---|
 | Season  | Categorical  |This contains information on which season and year the detection / non-detection data is associated it. Each element has four characters. The first two characters describe which season (SP = spring, SU = summer, FA = fall, WI = winter) while the final two characters describe the year (10 = 2010, 11 = 2011, etc.). The data is currently sorted so that the season and year continue temporally (i.e., SP10 data, SU10 data, FA10 data, WI11  data, etc.)   |
