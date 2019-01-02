@@ -30,6 +30,11 @@ calculate_steady_state.R: This function calculates the expected occupancy rate a
 
 `data <- read.csv(“fidino_sp_data.csv”, header = TRUE, stringsAsFactors = FALSE)`
 
+The ordering of the rows within `fidino_sp_data.csv` is hierarchical:
+
+1. By season (i.e., Spring, Summer, Fall, Winter).
+2. By camera trapping location (aphabetical, referred to as `StationID` in the file).
+
 ## Structure of `fidino_sp_data.csv`
 
 | Column header  | Data type  | Description  |
@@ -44,3 +49,16 @@ calculate_steady_state.R: This function calculates the expected occupancy rate a
 |  Opossum|Binary  |If an opossum was detected at a site on a given day the associated element in this column is a 1. If opossum were not detected it is a 0. If sampling did not occur it is NA.  |
 |Raccoon | Binary | If a raccoon was detected at a site on a given day the associated element in this column is a 1. If raccoon were not detected it is a 0. If sampling did not occur it is NA.  |
 
+
+**fidino_covariate_data.csv:** This is the three covariates used to create the urbanization PCA for each site. These covariates include: housing density, proportion tree cover, and proportion impervious cover all within 1000 meters of a site. It is alphabetically ordered by StationID and therefore has the same order for each season within fidino_sp_data.csv (after the sites that have fewer than 2 seasons of data are removed). This dataset has 103 rows, one for each site that was included in the analysis. 
+
+| Column header | Date type  | Description  |
+|---|---|---|
+| StationID | Categorical | Which site the collected covariate data is associated to. The whole data frame is sorted alphabetically based off of this column.  |
+| House  |  Numeric | Housing density (number of units within a 1000 meter buffer of a site)  |
+| Tree  | Numeric   | Proportion of tree cover (the percent of tree cover within a 1000 m buffer of a site). Can only range from 0 to 1.  |
+| Imp | Numeric | Proportion impervious cover (the percent of impervious cover within a 1000 m buffer of a site). Can only range from 0 to 1. |
+
+Housing density was collected from the Silvis lab website and is from the 2010 census.
+
+Tree cover and Impervious cover were calculated from the 2011 NLCD data.
