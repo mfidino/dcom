@@ -119,7 +119,7 @@ zcat[zcat =="111"] <- 8
 zcat <- as.numeric(zcat)
 
 # initial values
-inits <- function() list(z = zcat[1:10])
+inits <- function() list(z = zcat)
 
 # Parameters monitored
 params <- c('betaA', 'betaB', 'betaC', 'betaAB', 'betaBC', 'betaAC',
@@ -127,7 +127,7 @@ params <- c('betaA', 'betaB', 'betaC', 'betaAB', 'betaBC', 'betaAC',
             'alphaBC', 'alphaCB', 'alphaAC', 'alphaCA')
 
 # MCMC settings
-na <- 5000  ;  nc <- 3  ;  ni <- 300000  ;  nb <- 100000  ;  nt <- 10
+na <- 5000  ;  nc <- 3  ;  ni <- 50000  ;  nb <- 100000  ;  nt <- 3
 
 bdata <- list(y = ycat, psi_cov = psi_cov,
               psi_inxs_cov = psi_inxs_cov, rho_cov = rho_cov,
@@ -139,11 +139,11 @@ bdata <- list(y = ycat, psi_cov = psi_cov,
 
 load.module('glm')
 
-test <- jags.model('static_model.R',
+static_inxs <- jags.model('static_model.R',
                    data = bdata,inits = inits, n.adapt = na)
 
-test <- jags.update(test, nb)
+update.jags(static_inxs, nb)
 
-my_output <- jags.samples(test, params, n.iter = ni, thin = nt)
+jags.samples(static_inxs, params, n.iter = ni, thin = nt)
 
 
