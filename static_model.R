@@ -2,174 +2,183 @@ model{
   ######
   # Detection model
   ######
-  for(site in 1:nsite) {
-      for(week in 1:nsurvey) {
-        y[site, week] ~ dcat( rdm[site, ( 1:nout ) , z[site] ] )
+  for(i in 1:nsite) {
+      for(j in 1:nrep) {
+        y[i, j] ~ dcat( rdm[i, j, ( 1:ncat ) , z[i] ] )
       }
   }
   #######
   # Latent state model
   #######
-  for(j in 1:nsite) {
-    z[j, 1] ~ dcat( fsm[j, ( 1:nout )] )
+  for(i in 1:nsite) {
+    z[i] ~ dcat( lsp[i, ( 1:ncat )] )
   }
-  for( j in 1:nsite ) {
+  for( i in 1:nsite ) {
     ######
-    # Fill in all of the transition probabilities
-    ######
-    ######
-    # Latent state
+    # Latent state probabilities (lsp)
     ######
     #  Probabilities for each state
-    fsm[j, 1] <- 1 #--------------------------------------------------------|U
-    fsm[j, 2] <- exp( psi_one[1, j] ) #-------------------------------------|A
-    fsm[j, 3] <- exp( psi_one[2, j] ) #-------------------------------------|B
-    fsm[j, 4] <- exp( psi_one[3, j] ) #-------------------------------------|C
-    fsm[j, 5] <- exp( psi_two[1, j] ) #-------------------------------------|AB
-    fsm[j, 6] <- exp( psi_two[2, j] ) #-------------------------------------|BC
-    fsm[j, 7] <- exp( psi_two[2, j] ) #-------------------------------------|AC
-    fsm[j, 8] <- exp( psi_three[j]  ) #-------------------------------------|ABC
-    for(k in 1:nsurvey){
+    lsp[i, 1] <- 1 #---------------------------------------------|U
+    lsp[i, 2] <- exp( psiA[i] ) #--------------------------------|A
+    lsp[i, 3] <- exp( psiB[i] ) #--------------------------------|B
+    lsp[i, 4] <- exp( psiC[i] ) #--------------------------------|C
+    lsp[i, 5] <- exp( psiAB[i] ) #-------------------------------|AB
+    lsp[i, 6] <- exp( psiBC[i] ) #-------------------------------|BC
+    lsp[i, 7] <- exp( psiAC[i] ) #-------------------------------|AC
+    lsp[i, 8] <- exp( psiABC[i]  ) #-----------------------------|ABC
+    for(j in 1:nrep){
     ######
     # detection matrix (OS = observed state, TS = true state)
     # rdm = rho detection matrix. Each row sums to 1.
     # OS along rows, TS along columns
     ######
     # TS = U
-    rdm[j, k, 1, 1] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 1] <- 0 #----------------------------------------------------|OS = A
-    rdm[j, k, 3, 1] <- 0 #----------------------------------------------------|OS = B
-    rdm[j, k, 4, 1] <- 0 #----------------------------------------------------|OS = C
-    rdm[j, k, 5, 1] <- 0 #----------------------------------------------------|OS = AB
-    rdm[j, k, 6, 1] <- 0 #----------------------------------------------------|OS = BC
-    rdm[j, k, 7, 1] <- 0 #----------------------------------------------------|OS = AC
-    rdm[j, k, 8, 1] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 1] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 1] <- 0 #----------------------------------|OS = A
+    rdm[i, j, 3, 1] <- 0 #----------------------------------|OS = B
+    rdm[i, j, 4, 1] <- 0 #----------------------------------|OS = C
+    rdm[i, j, 5, 1] <- 0 #----------------------------------|OS = AB
+    rdm[i, j, 6, 1] <- 0 #----------------------------------|OS = BC
+    rdm[i, j, 7, 1] <- 0 #----------------------------------|OS = AC
+    rdm[i, j, 8, 1] <- 0 #----------------------------------|OS = ABC
     # TS = A
-    rdm[j, k, 1, 2] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 2] <- exp( rho[1, j] ) #-------------------------------------|OS = A
-    rdm[j, k, 3, 2] <- 0 #----------------------------------------------------|OS = B
-    rdm[j, k, 4, 2] <- 0 #----------------------------------------------------|OS = C
-    rdm[j, k, 5, 2] <- 0 #----------------------------------------------------|OS = AB
-    rdm[j, k, 6, 2] <- 0 #----------------------------------------------------|OS = BC
-    rdm[j, k, 7, 2] <- 0 #----------------------------------------------------|OS = AC
-    rdm[j, k, 8, 2] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 2] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 2] <- exp( rhoA[i, j] ) #------------------|OS = A
+    rdm[i, j, 3, 2] <- 0 #----------------------------------|OS = B
+    rdm[i, j, 4, 2] <- 0 #----------------------------------|OS = C
+    rdm[i, j, 5, 2] <- 0 #----------------------------------|OS = AB
+    rdm[i, j, 6, 2] <- 0 #----------------------------------|OS = BC
+    rdm[i, j, 7, 2] <- 0 #----------------------------------|OS = AC
+    rdm[i, j, 8, 2] <- 0 #----------------------------------|OS = ABC
     # TS = B
-    rdm[j, k, 1, 3] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 3] <- 0 #----------------------------------------------------|OS = A
-    rdm[j, k, 3, 3] <- exp( rho[2, j] ) #-------------------------------------|OS = B
-    rdm[j, k, 4, 3] <- 0 #----------------------------------------------------|OS = C
-    rdm[j, k, 5, 3] <- 0 #----------------------------------------------------|OS = AB
-    rdm[j, k, 6, 3] <- 0 #----------------------------------------------------|OS = BC
-    rdm[j, k, 7, 3] <- 0 #----------------------------------------------------|OS = AC
-    rdm[j, k, 8, 3] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 3] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 3] <- 0 #----------------------------------|OS = A
+    rdm[i, j, 3, 3] <- exp( rhoB[i, j] ) #------------------|OS = B
+    rdm[i, j, 4, 3] <- 0 #----------------------------------|OS = C
+    rdm[i, j, 5, 3] <- 0 #----------------------------------|OS = AB
+    rdm[i, j, 6, 3] <- 0 #----------------------------------|OS = BC
+    rdm[i, j, 7, 3] <- 0 #----------------------------------|OS = AC
+    rdm[i, j, 8, 3] <- 0 #----------------------------------|OS = ABC
     #TS = C
-    rdm[j, k, 1, 4] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 4] <- 0 #----------------------------------------------------|OS = A
-    rdm[j, k, 3, 4] <- 0 #----------------------------------------------------|OS = B
-    rdm[j, k, 4, 4] <- exp( rho[3, j] ) #-------------------------------------|OS = C
-    rdm[j, k, 5, 4] <- 0 #----------------------------------------------------|OS = AB
-    rdm[j, k, 6, 4] <- 0 #----------------------------------------------------|OS = BC
-    rdm[j, k, 7, 4] <- 0 #----------------------------------------------------|OS = AC
-    rdm[j, k, 8, 4] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 4] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 4] <- 0 #----------------------------------|OS = A
+    rdm[i, j, 3, 4] <- 0 #----------------------------------|OS = B
+    rdm[i, j, 4, 4] <- exp( rhoC[i, j] ) #------------------|OS = C
+    rdm[i, j, 5, 4] <- 0 #----------------------------------|OS = AB
+    rdm[i, j, 6, 4] <- 0 #----------------------------------|OS = BC
+    rdm[i, j, 7, 4] <- 0 #----------------------------------|OS = AC
+    rdm[i, j, 8, 4] <- 0 #----------------------------------|OS = ABC
     # TS = AB
-    rdm[j, k, 1, 5] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 5] <- exp( rho[1, j] ) #-------------------------------------|OS = A
-    rdm[j, k, 3, 5] <- exp(               delta[2, j] ) #---------------------|OS = B
-    rdm[j, k, 4, 5] <- 0 #----------------------------------------------------|OS = C
-    rdm[j, k, 5, 5] <- exp( delta[1, j] + delta[2, j] ) #---------------------|OS = AB
-    rdm[j, k, 6, 5] <- 0 #----------------------------------------------------|OS = BC
-    rdm[j, k, 7, 5] <- 0 #----------------------------------------------------|OS = AC
-    rdm[j, k, 8, 5] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 5] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 5] <- exp( rhoAB[i, j] ) #-----------------|OS = A
+    rdm[i, j, 3, 5] <- exp( rhoBA[i, j] ) #-----------------|OS = B
+    rdm[i, j, 4, 5] <- 0 #----------------------------------|OS = C
+    rdm[i, j, 5, 5] <- exp( rhoAB[i, j] + rhoBA[i, j]) #----|OS = AB
+    rdm[i, j, 6, 5] <- 0 #----------------------------------|OS = BC
+    rdm[i, j, 7, 5] <- 0 #----------------------------------|OS = AC
+    rdm[i, j, 8, 5] <- 0 #----------------------------------|OS = ABC
     # TS = BC
-    rdm[j, k, 1, 6] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 6] <- 0 #----------------------------------------------------|OS = A
-    rdm[j, k, 3, 6] <- exp( rho[2, j] ) #-------------------------------------|OS = B
-    rdm[j, k, 4, 6] <- exp(             rho[3, j] ) #-------------------------|OS = C
-    rdm[j, k, 5, 6] <- 0 #----------------------------------------------------|OS = AB
-    rdm[j, k, 6, 6] <- exp( rho[2, j] + rho[3, j] ) #-------------------------|OS = BC
-    rdm[j, k, 7, 6] <- 0 #----------------------------------------------------|OS = AC
-    rdm[j, k, 8, 6] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 6] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 6] <- 0 #----------------------------------|OS = A
+    rdm[i, j, 3, 6] <- exp( rhoBC[i, j] ) #-----------------|OS = B
+    rdm[i, j, 4, 6] <- exp( rhoCB[i, j] ) #-----------------|OS = C
+    rdm[i, j, 5, 6] <- 0 #----------------------------------|OS = AB
+    rdm[i, j, 6, 6] <- exp( rhoBC[i, j] + rhoCB[i, j] ) #---|OS = BC
+    rdm[i, j, 7, 6] <- 0 #----------------------------------|OS = AC
+    rdm[i, j, 8, 6] <- 0 #----------------------------------|OS = ABC
     # TS = AC
-    rdm[j, k, 1, 7] <- 1 #----------------------------------------------------|OS = U
-    rdm[j, k, 2, 7] <- exp( rho[1, j] ) #-------------------------------------|OS = A
-    rdm[j, k, 3, 7] <- 0 #----------------------------------------------------|OS = B
-    rdm[j, k, 4, 7] <- exp(             delta[2, j] ) #-----------------------|OS = C
-    rdm[j, k, 5, 7] <- 0 #----------------------------------------------------|OS = AB
-    rdm[j, k, 6, 7] <- 0 #----------------------------------------------------|OS = BC
-    rdm[j, k, 7, 7] <- exp( rho[1, j] + delta[2, j] ) #-----------------------|OS = AC
-    rdm[j, k, 8, 7] <- 0 #----------------------------------------------------|OS = ABC
+    rdm[i, j, 1, 7] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 7] <- exp( rhoAC[i, j] ) #-----------------|OS = A
+    rdm[i, j, 3, 7] <- 0 #----------------------------------|OS = B
+    rdm[i, j, 4, 7] <- exp( rhoCA[i, j] ) #-----------------|OS = C
+    rdm[i, j, 5, 7] <- 0 #----------------------------------|OS = AB
+    rdm[i, j, 6, 7] <- 0 #----------------------------------|OS = BC
+    rdm[i, j, 7, 7] <- exp( rhoAC[i, j] + rhoCA[i, j] ) #---|OS = AC
+    rdm[i, j, 8, 7] <- 0 #----------------------------------|OS = ABC
     # TS = ABC
-    rdm[j, k, 1, 8] <- 1 #|---------------------------------------------------|OS = U
-    rdm[j, k, 2, 8] <- exp( rho[1, j] ) #-------------------------------------|OS = A
-    rdm[j, k, 3, 8] <- exp(             delta[1, j] ) #-----------------------|OS = B
-    rdm[j, k, 4, 8] <- exp(                           delta[2, j] ) #---------|OS = C
-    rdm[j, k, 5, 8] <- exp( rho[1, j] + delta[1, j] ) #-----------------------|OS = AB
-    rdm[j, k, 6, 8] <- exp(             delta[1, j] + delta[2, j] ) #---------|OS = BC
-    rdm[j, k, 7, 8] <- exp( rho[1, j] +               delta[2, j] ) #---------|OS = AC
-    rdm[j, k, 8, 8] <- exp( rho[1, j] + delta[1, j] + delta[2, j] ) #---------|OS = ABC
+    rdm[i, j, 1, 8] <- 1 #----------------------------------|OS = U
+    rdm[i, j, 2, 8] <- exp( rhoABC[i, j] ) #----------------|OS = A
+    rdm[i, j, 3, 8] <- exp( rhoBAC[i, j] ) #----------------|OS = B
+    rdm[i, j, 4, 8] <- exp( rhoCAB[i, j] ) #----------------|OS = C
+    rdm[i, j, 5, 8] <- exp( rhoABC[i, j] + rhoBAC[i, j] ) #-|OS = AB
+    rdm[i, j, 6, 8] <- exp( rhoBAC[i, j] + rhoCAB[i, j] ) #-|OS = BC
+    rdm[i, j, 7, 8] <- exp( rhoABC[i, j] + rhoCAB[i, j] ) #-|OS = AC
+    rdm[i, j, 8, 8] <- exp( rhoABC[i, j] + rhoBAC[i, j]  +
+                            rhoCAB[i, j] ) #----------------|OS = ABC
     }
     ######
     # Occupancy linear predictors...
     ######
-    for( i in 1:nspec ) {
-      # ...for states A, B, and C (in that order)
-      psi_one[i, j]  <- inprod( a[i, ], psi_cov[j, ] )
-    }
+    # ...for states A, B, and C
+    psiA[i]  <- inprod( betaA, psi_cov[i, ] )
+    psiB[i]  <- inprod( betaB, psi_cov[i, ] )
+    psiC[i]  <- inprod( betaC, psi_cov[i, ] )
     # ...for states AB, BC, and AC (in that order)
-    psi_two[1, j] <- psi_one[1, j] + psi_one[2, j] + inprod( b[1, ], psi_inxs_cov[j, ] )
-    psi_two[2, j] <- psi_one[2, j] + psi_one[3, j] + inprod( b[2, ], psi_inxs_cov[j, ] )
-    psi_two[3, j] <- psi_one[1, j] + psi_one[3, j] + inprod( b[3, ], psi_inxs_cov[j, ] )
+    psiAB[i] <-  psiA[i] + psiB[i] + inprod( betaAB,
+                                             psi_inxs_cov[i, ] )
+    psiBC[i] <-  psiB[i] + psiC[i] + inprod( betaBC,
+                                             psi_inxs_cov[i, ] )
+    psiAC[i] <-  psiA[i] + psiC[i] + inprod( betaAC,
+                                             psi_inxs_cov[i, ] )
     # ...for state ABC
-    psi_three[j] <- sum( psi_one[ , j] ) + inprod( b[1, ], psi_inxs_cov[j, ] ) +
-     inprod( b[2, ], psi_inxs_cov[j, ] ) + inprod( b[3, ], psi_inxs_cov[j, ] )
+    psiABC[i] <-  psiA[i] + psiB[i] + psiC[i] +
+      inprod( betaAB, psi_inxs_cov[i, ] ) +
+      inprod( betaBC, psi_inxs_cov[i, ] ) +
+      inprod( betaAC, psi_inxs_cov[i, ] )
     #######
-    # Detection linear predictors...
+    # Detection linear predictors
     #######
-    for(i in 1:nspec){
-      for(k in 1:)
-      # ...for when the TRUE state is either A, B, or C (in that order)
-      rho_one[i, j] <- inprod(d[i,], rho_cov[])
+    for(j in 1:nrep){
+    # These are the baseline detection linear predictors
+    #  that do not incorporate interactions.
+    rhoA[i, j] <- inprod( alphaA, rho_cov[i, j, ] )
+    rhoB[i, j] <- inprod( alphaB, rho_cov[i, j, ] )
+    rhoC[i, j] <- inprod( alphaC, rho_cov[i, j, ] )
+    # These are the asymmetric interactions between all 3 species
+    rhoAB[i, j] <- rhoA[i, j] + inprod( alphaAB, rho_inxs_cov[i] )
+    rhoAC[i, j] <- rhoA[i, j] + inprod( alphaAC, rho_inxs_cov[i] )
+    rhoBA[i, j] <- rhoB[i, j] + inprod( alphaBA, rho_inxs_cov[i] )
+    rhoBC[i, j] <- rhoB[i, j] + inprod( alphaBC, rho_inxs_cov[i] )
+    rhoCA[i, j] <- rhoC[i, j] + inprod( alphaCA, rho_inxs_cov[i] )
+    rhoCB[i, j] <- rhoC[i, j] + inprod( alphaCB, rho_inxs_cov[i] )
+    # These are the aymmetric interactions when all 3 species
+    #  are present
+    rhoABC[i, j] <- rhoA[i, j] + inprod(alphaAB, rho_inxs_cov[i]) +
+      inprod(alphaAC, rho_inxs_cov[i])
+    rhoBAC[i, j] <- rhoB[i, j] + inprod(alphaBA, rho_inxs_cov[i]) +
+      inprod(alphaBC, rho_inxs_cov[i])
+    rhoCAB[i, j] <- rhoC[i, j] + inprod(alphaCA, rho_inxs_cov[i]) +
+      inprod(alphaCB, rho_inxs_cov[i])
     }
-    # coyote influence on detection for opossum and raccoon
-    delta[1, j]  <- inprod(f[2, ], rho_cov[j, ] ) + inprod( l[1, ], delta_cov[j, ] )
-    delta[2, j]  <- inprod(f[3, ], rho_cov[j, ] ) + inprod( l[2, ], delta_cov[j, ] )
-  } # closes for loop for j (sites) all the way up at the top of the model
+  } # closes the j loop for sites ALL the way at the top of the model
   #####
   # Priors
   ######
-  for(i in 1:nspec){
-    # Initial Occupancy
-    for( psip in 1:ncov_psi ){
-      a[i, psip] ~ dlogis(0, 1)
-    }
-    # Colonization
-    for( gamp in 1:ncov_gam ){
-      b[i, gamp] ~ dlogis(0, 1)
-      #b0[i, gamp] ~ dlogis(0, 1)
-    }
-    # Extinction
-    for( epsp in 1:ncov_eps ){
-      d[i, epsp] ~ dlogis(0, 1)
-      #d0[i, epsp] ~ dlogis(0, 1)
-    }
-    # Detection
-    for( rhop in 1:ncov_rho ){
-      f[i, rhop] ~ dlogis(0, 1)
-    }
+  # For first order psi priors
+  for(fo_psi in 1:nfirst_order_psi){
+  betaA[fo_psi] ~ dnorm(0, 0.1)
+  betaB[fo_psi] ~ dnorm(0, 0.1)
+  betaC[fo_psi] ~ dnorm(0, 0.1)
   }
-  for( k in 1:n_inxs ){
-    # Inxs on colonization
-    for( pip in 1:ncov_pi ){
-      g[k, pip] ~ dlogis(0, 1)
-    }
-    # Inxs on extinction
-    for( taup in 1:ncov_tau ){
-      h[k, taup] ~ dlogis(0, 1)
-    }
+  # for second order psi priors
+  for(so_psi in 1:nsecond_order_psi){
+    betaAB[so_psi] ~ dnorm(0, 0.1)
+    betaAC[so_psi] ~ dnorm(0, 0.1)
+    betaBC[so_psi] ~ dnorm(0, 0.1)
   }
-  # Inxs on detection
-  for( delp in 1:ncov_delta ){
-    l[1, delp] ~ dlogis(0, 1)
-    l[2, delp] ~ dlogis(0, 1)
+  # for first order rho priors
+  for(fo_rho in 1:nfirst_order_rho){
+    alphaA[fo_rho] ~ dnorm(0, 0.1)
+    alphaB[fo_rho] ~ dnorm(0, 0.1)
+    alphaC[fo_rho] ~ dnorm(0, 0.1)
+  }
+  # for second order rho priors
+  for(so_rho in 1:nsecond_order_rho){
+    alphaAB[so_rho] ~ dnorm(0, 0.1)
+    alphaBA[so_rho] ~ dnorm(0, 0.1)
+    alphaAC[so_rho] ~ dnorm(0, 0.1)
+    alphaCA[so_rho] ~ dnorm(0, 0.1)
+    alphaBC[so_rho] ~ dnorm(0, 0.1)
+    alphaCB[so_rho] ~ dnorm(0, 0.1)
   }
 }
