@@ -1,5 +1,6 @@
 library(AHMbook)
 library(rjags)
+library(runjags)
 
 # bring in the data
 data(HubbardBrook)
@@ -127,7 +128,7 @@ params <- c('betaA', 'betaB', 'betaC', 'betaAB', 'betaBC', 'betaAC',
             'alphaBC', 'alphaCB', 'alphaAC', 'alphaCA')
 
 # MCMC settings
-na <- 5000  ;  nc <- 3  ;  ni <- 50000  ;  nb <- 100000  ;  nt <- 3
+na <- 1000  ;  nc <- 3  ;  ni <- 30000  ;  nb <- 20000  ;  nt <- 1
 
 bdata <- list(y = ycat, psi_cov = psi_cov,
               psi_inxs_cov = psi_inxs_cov, rho_cov = rho_cov,
@@ -139,11 +140,17 @@ bdata <- list(y = ycat, psi_cov = psi_cov,
 
 load.module('glm')
 
-static_inxs <- jags.model('static_model.R',
-                   data = bdata,inits = inits, n.adapt = na)
 
-update.jags(static_inxs, nb)
-
-jags.samples(static_inxs, params, n.iter = ni, thin = nt)
-
+start_time <- Sys.time()
+static_inxs <- run.jags('static_model.R',
+                        monitor = params,
+                        data = bdata,
+                        n.chains = nc,
+                        inits = inits,
+                        burnin = nb,
+                        sample = floor(ni/nc),
+                        adapt = na,
+                        thin = nt,
+                        module = 'glm')
+end_time <- Sys.time()
 
